@@ -89,7 +89,7 @@
 
       {% if perms.core.view_all_attendance %}
         <a class="{% if n == 'attendance_missing_punches' %}on{% endif %}" href="{% url 'attendance_missing_punches' %}">Missing Punches</a>
-        {% if perms.core.view_attendance_audit %}<a class="{% if n == 'attendance_history' %}on{% endif %}" href="{% url 'attendance_history' %}">Change History</a>{% endif %}
+        {% if perms.core.view_attendance_audit %}<a class="{% if n == 'attendance_history' %}on{% endif %}" href="{% url 'attendance_history' %}">Change history</a>{% endif %}
       {% endif %}
     </details>
 

@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal, ROUND_HALF_UP
 
+from django.apps import apps
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Q, Prefetch
@@ -281,9 +282,11 @@ def calculate_employee_payroll(employee, month, year):
         raise ValidationError(f"Deductions exceed gross pay for {employee.name}; review the adjustments.")
 
     # Expense Reimbursements (non-taxable payout to employee)
-    unpaid_claims = []
-    if hasattr(employee, "expense_claims"):
-        unpaid_claims = list(employee.expense_claims.filter(status="APPROVED", payroll_run__isnull=True))
+    unpaid_claims = (
+        employee._unpaid_expense_claims
+        if hasattr(employee, "_unpaid_expense_claims")
+        else (list(employee.expense_claims.filter(status="APPROVED", payroll_run__isnull=True)) if hasattr(employee, "expense_claims") else [])
+    )
     expense_reimbursements = money(sum((claim.amount for claim in unpaid_claims), Decimal("0.00")))
     for claim in unpaid_claims:
         components.append((f"Expense Reimbursement: {claim.title}", "REIMBURSEMENT", str(money(claim.amount))))
@@ -349,6 +352,7 @@ def calculate_payroll_rows(month, year, *, user=None, organization=None):
             Prefetch("attendance", queryset=Attendance.objects.filter(date__month=month, date__year=year), to_attr="_period_attendance"),
             Prefetch("payroll_components", queryset=EmployeePayrollComponent.objects.filter(active=True, component__active=True).select_related("component"), to_attr="_payroll_components"),
             Prefetch("payroll_adjustments", queryset=PayrollAdjustment.objects.filter(month=month, year=year, approved=True), to_attr="_payroll_adjustments"),
+            Prefetch("expense_claims", queryset=apps.get_model("core", "ExpenseClaim").objects.filter(status="APPROVED", payroll_run__isnull=True), to_attr="_unpaid_expense_claims"),
         )
         .order_by("name")
     )

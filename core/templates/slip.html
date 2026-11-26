@@ -70,9 +70,9 @@
       <tr><th>Component</th><th class="r">Amount</th></tr>
     </thead>
     <tbody>
-      <tr><td>Basic Salary</td><td class="r">{{ currency }} {{ basic|floatformat:2 }}</td></tr>
+      <tr><td>Basic salary</td><td class="r">{{ currency }} {{ basic|floatformat:2 }}</td></tr>
       {% if s.overtime_pay %}
-      <tr><td>Overtime Pay ({{ overtime_text }})</td><td class="r" style="color:var(--ok);">+ {{ currency }} {{ s.overtime_pay|floatformat:2 }}</td></tr>
+      <tr><td>Overtime ({{ overtime_text }})</td><td class="r" style="color:var(--ok);">+ {{ currency }} {{ s.overtime_pay|floatformat:2 }}</td></tr>
       {% endif %}
       {% for description, kind, amount in components %}
       <tr>
@@ -82,7 +82,7 @@
         </td>
       </tr>
       {% endfor %}
-      <tr><td>Gross Salary</td><td class="r"><b>{{ currency }} {{ s.gross|floatformat:2 }}</b></td></tr>
+      <tr><td>Gross pay</td><td class="r"><b>{{ currency }} {{ s.gross|floatformat:2 }}</b></td></tr>
       <tr><td>Per-Day Pay Calculation Rate</td><td class="r">{{ currency }} {{ s.per_day_pay|floatformat:2 }}</td></tr>
       {% if s.absent_days %}
       <tr><td>Absent Days Deductions ({{ s.absent_days }} days)</td><td class="r" style="color:var(--bad);">- {{ currency }} {{ s.calculation_snapshot.absence_deduction|default:s.deduction|floatformat:2 }}</td></tr>
